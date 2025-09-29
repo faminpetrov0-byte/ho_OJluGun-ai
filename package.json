@@ -2,7 +2,7 @@
 	"name": "ho-ojlugun-ai",
 	"displayName": "ho_OJluGun AI",
 	"description": "Autonomous coding agent with enhanced capabilities - custom AI assistant by ho_OJluGun",
-	"version": "0.1.2",
+	"version": "0.1.3",
 	"icon": "assets/icons/icon.png",
 	"engines": {
 		"vscode": "^1.84.0"

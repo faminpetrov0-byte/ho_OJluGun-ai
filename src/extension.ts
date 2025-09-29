@@ -58,7 +58,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	
 	// Register test command immediately
 	context.subscriptions.push(
-		vscode.commands.registerCommand("cline.testCommand", () => {
+		vscode.commands.registerCommand("ho-ojlugun-ai.testCommand", () => {
 			vscode.window.showInformationMessage("🎯 Test command works! Extension is loaded.")
 		})
 	)
@@ -67,13 +67,13 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	const sidebarWebview = (await initialize(context)) as VscodeWebviewProvider
 
-	Logger.log("Cline extension activated")
+	Logger.log("ho_OJluGun AI extension activated")
 
 	const testModeWatchers = await initializeTestMode(sidebarWebview)
 	// Initialize test mode and add disposables to context
 	context.subscriptions.push(...testModeWatchers)
 
-	vscode.commands.executeCommand("setContext", "cline.isDevMode", IS_DEV && IS_DEV === "true")
+	vscode.commands.executeCommand("setContext", "ho-ojlugun-ai.isDevMode", IS_DEV && IS_DEV === "true")
 
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider(VscodeWebviewProvider.SIDEBAR_ID, sidebarWebview, {
@@ -271,7 +271,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			.then((module) => {
 				const devTaskCommands = module.registerTaskCommands(context, sidebarWebview.controller)
 				context.subscriptions.push(...devTaskCommands)
-				Logger.log("Cline dev task commands registered")
+				Logger.log("ho_OJluGun AI dev task commands registered")
 			})
 			.catch((error) => {
 				Logger.log("Failed to register dev task commands: " + error)
@@ -513,7 +513,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	// Register the openWalkthrough command handler
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.Walkthrough, async () => {
-			await vscode.commands.executeCommand("workbench.action.openWalkthrough", `${context.extension.id}#ClineWalkthrough`)
+			await vscode.commands.executeCommand("workbench.action.openWalkthrough", `${context.extension.id}#hoOJluGunWalkthrough`)
 			telemetryService.captureButtonClick("command_openWalkthrough")
 		}),
 	)
@@ -529,7 +529,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	// Register the ho_OJluGun II command handler
 	context.subscriptions.push(
-		vscode.commands.registerCommand("cline.openCosmosAI", async () => {
+		vscode.commands.registerCommand("ho-ojlugun-ai.openCosmosAI", async () => {
 			try {
 				Logger.log("Opening ho_OJluGun AI in new tab")
 
@@ -560,7 +560,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	// Register the short ho_ command handler
 	context.subscriptions.push(
-		vscode.commands.registerCommand("cline.openCosmosAI2", async () => {
+		vscode.commands.registerCommand("ho-ojlugun-ai.openCosmosAI2", async () => {
 			// Open Cline in new tab with Cosmos AI branding
 			await openClineInNewTab()
 			telemetryService.captureButtonClick("command_openCosmosAI2")
@@ -579,9 +579,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(
 		context.secrets.onDidChange(async (event) => {
-			if (event.key === "clineAccountId") {
+			if (event.key === "hoOJluGunAccountId") {
 				// Check if the secret was removed (logout) or added/updated (login)
-				const secretValue = await context.secrets.get("clineAccountId")
+				const secretValue = await context.secrets.get("hoOJluGunAccountId")
 				const activeWebviewProvider = WebviewProvider.getVisibleInstance()
 				const controller = activeWebviewProvider?.controller
 
@@ -605,7 +605,7 @@ function setupHostProvider(context: ExtensionContext) {
 
 	const createWebview = (type: WebviewProviderType) => new VscodeWebviewProvider(context, type)
 	const createDiffView = () => new VscodeDiffViewProvider()
-	const outputChannel = vscode.window.createOutputChannel("Cline")
+	const outputChannel = vscode.window.createOutputChannel("ho_OJluGun AI")
 	context.subscriptions.push(outputChannel)
 
 	const getCallbackUrl = async () => `${vscode.env.uriScheme || "vscode"}://${context.extension.id}`
@@ -655,7 +655,7 @@ export async function deactivate() {
 	// Clean up test mode
 	cleanupTestMode()
 
-	Logger.log("Cline extension deactivated")
+	Logger.log("ho_OJluGun AI extension deactivated")
 }
 
 // TODO: Find a solution for automatically removing DEV related content from production builds.

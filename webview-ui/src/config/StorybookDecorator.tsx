@@ -1,7 +1,7 @@
 import { cn } from "@heroui/react"
 import type { Decorator } from "@storybook/react-vite"
 import React from "react"
-import { ClineAuthContext, ClineAuthContextType, ClineAuthProvider, useClineAuth } from "@/context/ClineAuthContext"
+import { hoOJluGunAuthContext, hoOJluGunAuthContextType, hoOJluGunAuthProvider, usehoOJluGunAuth } from "@/context/ClineAuthContext"
 import {
 	ExtensionStateContext,
 	ExtensionStateContextProvider,
@@ -63,7 +63,7 @@ const ClineAuthProviderWithOverrides: React.FC<{
 	overrides?: Partial<ClineAuthContextType>
 	children: React.ReactNode
 }> = ({ overrides, children }) => {
-	const authContext = useClineAuth()
+	const authContext = usehoOJluGunAuth()
 	return <ClineAuthContext.Provider value={{ ...authContext, ...overrides }}>{children}</ClineAuthContext.Provider>
 }
 

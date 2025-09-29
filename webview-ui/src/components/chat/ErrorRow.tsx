@@ -15,7 +15,7 @@ interface ErrorRowProps {
 }
 
 const ErrorRow = memo(({ message, errorType, apiRequestFailedMessage, apiReqStreamingFailedMessage }: ErrorRowProps) => {
-	const { clineUser } = useClineAuth()
+	const { hoOJluGunUser } = usehoOJluGunAuth()
 
 	const renderErrorContent = () => {
 		switch (errorType) {
@@ -77,7 +77,7 @@ const ErrorRow = memo(({ message, errorType, apiRequestFailedMessage, apiReqStre
 									<br />
 									<br />
 									{/* The user is signed in or not using cline provider */}
-									{clineUser && !isClineProvider ? (
+									{hoOJluGunUser && !isClineProvider ? (
 										<span className="mb-4 text-[var(--vscode-descriptionForeground)]">
 											(Click "Retry" below)
 										</span>

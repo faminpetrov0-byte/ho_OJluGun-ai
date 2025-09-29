@@ -7,14 +7,14 @@ import HistoryView from "./components/history/HistoryView"
 import McpView from "./components/mcp/configuration/McpConfigurationView"
 import SettingsView from "./components/settings/SettingsView"
 import WelcomeView from "./components/welcome/WelcomeView"
-import { useClineAuth } from "./context/ClineAuthContext"
+import { usehoOJluGunAuth } from "./context/ClineAuthContext"
 import { useExtensionState } from "./context/ExtensionStateContext"
 import { Providers } from "./Providers"
 import { UiServiceClient } from "./services/grpc-client"
 
 /*
  * 🚀 Cosmos UI Enhancements Integration
- * Используем современные UX принципы из нашего проекта для улучшения Cline
+ * Используем современные UX принципы из нашего проекта для улучшения ho_OJluGun AI
  */
 import "./cosmos-ui-enhancements.css"
 
@@ -39,7 +39,7 @@ const AppContent = () => {
 		hideAnnouncement,
 	} = useExtensionState()
 
-	const { clineUser, organizations, activeOrganization } = useClineAuth()
+	const { hoOJluGunUser, organizations, activeOrganization } = usehoOJluGunAuth()
 
 	useEffect(() => {
 		if (shouldShowAnnouncement) {
@@ -75,7 +75,7 @@ const AppContent = () => {
 			{showAccount && (
 				<AccountView
 					activeOrganization={activeOrganization}
-					clineUser={clineUser}
+					hoOJluGunUser={hoOJluGunUser}
 					onDone={hideAccount}
 					organizations={organizations}
 				/>

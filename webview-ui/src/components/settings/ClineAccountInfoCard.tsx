@@ -1,14 +1,14 @@
 import { EmptyRequest } from "@shared/proto/cline/common"
 import { VSCodeButton } from "@vscode/webview-ui-toolkit/react"
-import { useClineAuth } from "@/context/ClineAuthContext"
+import { usehoOJluGunAuth } from "@/context/ClineAuthContext"
 import { useExtensionState } from "@/context/ExtensionStateContext"
 import { AccountServiceClient } from "@/services/grpc-client"
 
-export const ClineAccountInfoCard = () => {
-	const { clineUser } = useClineAuth()
+export const hoOJluGunAccountInfoCard = () => {
+	const { hoOJluGunUser } = usehoOJluGunAuth()
 	const { apiConfiguration, navigateToAccount } = useExtensionState()
 
-	const user = apiConfiguration?.clineAccountId ? clineUser : undefined
+	const user = apiConfiguration?.hoOJluGunAccountId ? hoOJluGunUser : undefined
 
 	const handleLogin = () => {
 		AccountServiceClient.accountLoginClicked(EmptyRequest.create()).catch((err) =>
@@ -29,7 +29,7 @@ export const ClineAccountInfoCard = () => {
 			) : (
 				<div>
 					<VSCodeButton className="mt-0" onClick={handleLogin}>
-						Sign Up with Cline
+						Sign Up with ho_OJluGun AI
 					</VSCodeButton>
 				</div>
 			)}

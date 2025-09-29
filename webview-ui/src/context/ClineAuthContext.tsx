@@ -6,7 +6,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { AccountServiceClient } from "@/services/grpc-client"
 
 // Define User type (you may need to adjust this based on your actual User type)
-export interface ClineUser {
+export interface hoOJluGunUser {
 	uid: string
 	email?: string
 	displayName?: string
@@ -14,16 +14,16 @@ export interface ClineUser {
 	appBaseUrl?: string
 }
 
-export interface ClineAuthContextType {
-	clineUser: ClineUser | null
+export interface hoOJluGunAuthContextType {
+	hoOJluGunUser: hoOJluGunUser | null
 	organizations: UserOrganization[] | null
 	activeOrganization: UserOrganization | null
 }
 
-export const ClineAuthContext = createContext<ClineAuthContextType | undefined>(undefined)
+export const hoOJluGunAuthContext = createContext<hoOJluGunAuthContextType | undefined>(undefined)
 
-export const ClineAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-	const [user, setUser] = useState<ClineUser | null>(null)
+export const hoOJluGunAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+	const [user, setUser] = useState<hoOJluGunUser | null>(null)
 	const [userOrganizations, setUserOrganizations] = useState<UserOrganization[] | null>(null)
 
 	const getUserOrganizations = useCallback(async () => {
@@ -42,7 +42,7 @@ export const ClineAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 	}, [userOrganizations])
 
 	useEffect(() => {
-		console.log("Extension: ClineAuthContext: user updated:", user?.uid)
+		console.log("Extension: hoOJluGunAuthContext: user updated:", user?.uid)
 	}, [user?.uid])
 
 	// Handle auth status update events
@@ -75,21 +75,21 @@ export const ClineAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 	}, [])
 
 	return (
-		<ClineAuthContext.Provider
+		<hoOJluGunAuthContext.Provider
 			value={{
-				clineUser: user,
+				hoOJluGunUser: user,
 				organizations: userOrganizations,
 				activeOrganization,
 			}}>
 			{children}
-		</ClineAuthContext.Provider>
+		</hoOJluGunAuthContext.Provider>
 	)
 }
 
-export const useClineAuth = () => {
-	const context = useContext(ClineAuthContext)
+export const usehoOJluGunAuth = () => {
+	const context = useContext(hoOJluGunAuthContext)
 	if (context === undefined) {
-		throw new Error("useClineAuth must be used within a ClineAuthProvider")
+		throw new Error("usehoOJluGunAuth must be used within a hoOJluGunAuthProvider")
 	}
 	return context
 }

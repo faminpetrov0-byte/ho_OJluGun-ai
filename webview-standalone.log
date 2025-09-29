@@ -760,3 +760,11 @@ Port 25464 is in use, trying another one...
    |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 7599|  textarea:focus {
 7600|    outline: 1.5px solid var(--vscode-focusBorder, #007fd4);
+12:40:19 AM [vite] (client) page reload /Users/Ho_OJluGun/Applications/ho_OJluGun_ai/src/shared/proto/host/env.ts
+12:40:57 AM [vite] (client) hmr update /src/context/ClineAuthContext.tsx, /src/index.css
+12:41:08 AM [vite] (client) hmr update /src/App.tsx, /src/index.css
+12:41:47 AM [vite] (client) hmr update /src/components/settings/ClineAccountInfoCard.tsx, /src/index.css
+12:42:01 AM [vite] (client) hmr update /src/components/settings/providers/ClineProvider.tsx, /src/index.css
+12:42:57 AM [vite] (client) page reload src/config/StorybookDecorator.tsx
+12:43:03 AM [vite] (client) hmr update /src/components/chat/ChatTextArea.tsx, /src/index.css
+12:43:15 AM [vite] (client) hmr update /src/components/chat/ErrorRow.tsx, /src/index.css

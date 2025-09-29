@@ -2,7 +2,7 @@ import { Mode } from "@shared/storage/types"
 import { VSCodeCheckbox, VSCodeDropdown, VSCodeOption } from "@vscode/webview-ui-toolkit/react"
 import { useState } from "react"
 import { useExtensionState } from "@/context/ExtensionStateContext"
-import { ClineAccountInfoCard } from "../ClineAccountInfoCard"
+import { hoOJluGunAccountInfoCard } from "../ClineAccountInfoCard"
 import { DropdownContainer } from "../common/ModelSelector"
 import OpenRouterModelPicker, { OPENROUTER_MODEL_PICKER_Z_INDEX } from "../OpenRouterModelPicker"
 import { useApiConfigurationHandlers } from "../utils/useApiConfigurationHandlers"
@@ -29,7 +29,7 @@ export const ClineProvider = ({ showModelOptions, isPopup, currentMode }: ClineP
 		<div>
 			{/* Cline Account Info Card */}
 			<div style={{ marginBottom: 14, marginTop: 4 }}>
-				<ClineAccountInfoCard />
+				<hoOJluGunAccountInfoCard />
 			</div>
 
 			{showModelOptions && (
