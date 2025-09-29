@@ -1,0 +1,45 @@
+{
+  "name": "ho_OJluGun AI Basic Test",
+  "description": "Basic functionality test for ho_OJluGun AI extension",
+  "steps": [
+    {
+      "name": "Initialize Extension",
+      "description": "Test extension initialization",
+      "request": {
+        "method": "POST",
+        "path": "/initialize",
+        "body": {
+          "workspacePath": "/tmp/test-workspace",
+          "settings": {
+            "apiProvider": "anthropic",
+            "apiKey": "test-key"
+          }
+        }
+      },
+      "expectedResponse": {
+        "status": 200,
+        "body": {
+          "success": true
+        }
+      }
+    },
+    {
+      "name": "Create New Task",
+      "description": "Test task creation functionality",
+      "request": {
+        "method": "POST",
+        "path": "/task",
+        "body": {
+          "description": "Test task for ho_OJluGun AI",
+          "mode": "plan"
+        }
+      },
+      "expectedResponse": {
+        "status": 200,
+        "body": {
+          "taskId": "test-task-id"
+        }
+      }
+    }
+  ]
+}

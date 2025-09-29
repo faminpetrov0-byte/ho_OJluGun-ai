@@ -1,0 +1,62 @@
+
+> ho-ojlugun-ai@0.1.2 test:standalone
+> npm run test:sca-server
+
+
+> ho-ojlugun-ai@0.1.2 test:sca-server
+> npx tsx watch scripts/test-standalone-core-api-server.ts
+
+Starting Simple Cline gRPC Server...
+Project Root: /Users/Ho_OJluGun/Applications/ho_OJluGun_ai
+Workspace: /Users/Ho_OJluGun/Applications/ho_OJluGun_ai
+ProtoBus Port: 26040
+HostBridge Port: 26041
+Looking for standalone build at: /Users/Ho_OJluGun/Applications/ho_OJluGun_ai/dist-standalone/cline-core.js
+Cline API Server started in-process
+Starting HostBridge test server...
+Temp user data dir: /var/folders/2f/jq4x2y7n66d03ycc8thdj_pm0000gp/T/vscebr3MvJ
+Temp extensions dir: /Users/Ho_OJluGun/Applications/ho_OJluGun_ai/dist-standalone/vsce-extension
+Extracting standalone.zip to extensions directory...
+Successfully extracted standalone.zip to: /Users/Ho_OJluGun/Applications/ho_OJluGun_ai/dist-standalone/vsce-extension
+Starting Cline Core Service... (useC8=false)
+Cline gRPC Server is running on 127.0.0.1:26040
+Press Ctrl+C to stop
+Cline environment: local
+Loading stubs...
+Finished loading stubs
+Loading stub impls...
+Finished loading stub impls...
+XS variant configuration warnings: [
+  'Component overrides for unused components: TOOL_USE_SECTION, TOOLS_SECTION, MCP_SECTION, TODO_SECTION, FEEDBACK_SECTION',
+  'Missing recommended components: TOOL_USE_SECTION'
+]
+[2025-09-29T20:19:27.829] #bot.cline.server.ts Running standalone cline 0.1.2
+[2025-09-29T20:19:27.831] #bot.cline.server.ts CLINE_ENVIRONMENT: local
+[2025-09-29T20:19:27.832] #bot.cline.server.ts Using settings dir: /var/folders/2f/jq4x2y7n66d03ycc8thdj_pm0000gp/T/vscebr3MvJ/data
+Finished loading vscode context...
+[2025-09-29T20:19:27.837] #bot.cline.server.ts 
+
+
+Starting cline-core service...
+
+
+
+[2025-09-29T20:19:28.040] #bot.cline.server.ts HostBridge serving at localhost:26041; continuing startup
+Telemetry distinct ID initialized: fake-machine-id-Ho.local
+[2025-09-29T20:19:28.118] #bot.cline.server.ts INFO [NoOpFeatureFlagsProvider] getFeatureFlag called with flagName=custom-instructions
+[2025-09-29T20:19:28.119] #bot.cline.server.ts INFO [NoOpFeatureFlagsProvider] getFeatureFlag called with flagName=dev-env-posthog
+[2025-09-29T20:19:28.119] #bot.cline.server.ts INFO [NoOpFeatureFlagsProvider] getFeatureFlag called with flagName=dictation
+[2025-09-29T20:19:28.119] #bot.cline.server.ts INFO [NoOpFeatureFlagsProvider] getFeatureFlag called with flagName=focus_chain_checklist
+[2025-09-29T20:19:28.120] #bot.cline.server.ts INFO [NoOpFeatureFlagsProvider] getFeatureFlag called with flagName=multi_root_workspace
+Migrating welcomeViewCompleted setting...
+Migration: Set welcomeViewCompleted to false based on existing API keys
+[Storage Migration] No task history to migrate
+FileContextTracker: Processed 0 tasks, found 0 pending warnings, 0 orphaned, deleted 0, took 2ms
+[2025-09-29T20:19:28.142] #bot.cline.server.ts ClineProvider instantiated
+[2025-09-29T20:19:28.146] #bot.cline.server.ts Checking for legacy checkpoints...
+[2025-09-29T20:19:28.147] #bot.cline.server.ts LOG Cline version changed: undefined -> 0.1.2. First run or update detected.
+No user found after restoring auth token
+[2025-09-29T20:19:29.269] #bot.cline.server.ts ProtoBus gRPC server listening on 127.0.0.1:26040
+[2025-09-29T20:19:29.281] #bot.cline.server.ts LOG [NoOpTelemetryProvider] user.telemetry_enabled: {"extension_version":"0.1.2","platform":"unknown","platform_version":"unknown","os_type":"darwin","os_version":"Darwin Kernel Version 25.0.0: Wed Aug 27 20:23:58 PDT 2025; root:xnu-12377.1.9~17/RELEASE_X86_64"}
+[TelemetryService] Initialized with telemetry provider
+[2025-09-29T20:19:29.281] #bot.cline.server.ts LOG [NoOpTelemetryProvider] user.extension_activated: undefined

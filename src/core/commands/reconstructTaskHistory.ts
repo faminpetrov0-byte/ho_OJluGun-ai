@@ -161,7 +161,7 @@ async function scanTaskDirectories(tasksDir: string): Promise<string[]> {
 async function reconstructTaskHistoryItem(context: vscode.ExtensionContext, taskId: string): Promise<HistoryItem | null> {
 	try {
 		// Get task directory
-		const taskDir = await ensureTaskDirectoryExists(context, taskId)
+		const _taskDir = await ensureTaskDirectoryExists(context, taskId)
 
 		// Load UI messages to extract task info
 		const clineMessages = await getSavedClineMessages(context, taskId)
@@ -247,11 +247,21 @@ function extractTaskInformation(clineMessages: ClineMessage[], metadata: any): T
 		try {
 			if (msg.text) {
 				const apiInfo = JSON.parse(msg.text)
-				if (apiInfo.tokensIn) tokensIn += apiInfo.tokensIn
-				if (apiInfo.tokensOut) tokensOut += apiInfo.tokensOut
-				if (apiInfo.cacheWrites) cacheWrites += apiInfo.cacheWrites
-				if (apiInfo.cacheReads) cacheReads += apiInfo.cacheReads
-				if (apiInfo.cost) totalCost += apiInfo.cost
+				if (apiInfo.tokensIn) {
+					tokensIn += apiInfo.tokensIn
+				}
+				if (apiInfo.tokensOut) {
+					tokensOut += apiInfo.tokensOut
+				}
+				if (apiInfo.cacheWrites) {
+					cacheWrites += apiInfo.cacheWrites
+				}
+				if (apiInfo.cacheReads) {
+					cacheReads += apiInfo.cacheReads
+				}
+				if (apiInfo.cost) {
+					totalCost += apiInfo.cost
+				}
 			}
 		} catch {
 			// Ignore parsing errors

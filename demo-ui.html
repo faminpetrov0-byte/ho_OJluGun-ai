@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ho_OJluGun AI - Demo UI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .nav-btn.active {
+            background: #007acc;
+            border-color: #007acc;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .welcome-screen {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .welcome-title {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.2em;
+            opacity: 0.8;
+            margin-bottom: 40px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+
+        .chat-input-area {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .chat-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            color: white;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .chat-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .action-btn.secondary {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+        }
+
+        .action-btn.danger {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+        }
+
+        .status-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4CAF50;
+        }
+
+        .status-dot.warning {
+            background: #ff9800;
+        }
+
+        .status-dot.error {
+            background: #f44336;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #2a2a3a 0%, #1e1e2e 100%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .modal-text {
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 10px;
+                gap: 10px;
+            }
+
+            .nav-btn {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+
+            .welcome-title {
+                font-size: 2em;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="navbar">
+            <div style="font-size: 18px; font-weight: bold;">🚀 ho_OJluGun AI</div>
+            <button class="nav-btn active" onclick="showChat()">💬 Chat</button>
+            <button class="nav-btn" onclick="showBrowser()">🌐 Browser</button>
+            <button class="nav-btn" onclick="showConsultation()">⏳ AI Consultation</button>
+            <button class="nav-btn" onclick="showSettings()">⚙️ Settings</button>
+            <button class="nav-btn" onclick="showMCP()">🔧 MCP</button>
+        </div>
+
+        <div class="main-content">
+            <div class="chat-container" id="chatContainer">
+                <div class="welcome-screen" id="welcomeScreen">
+                    <div class="welcome-title">Welcome to ho_OJluGun AI</div>
+                    <div class="welcome-subtitle">Your autonomous coding assistant is ready to help!</div>
+
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">🤖</div>
+                            <div class="feature-title">Autonomous Execution</div>
+                            <div class="feature-desc">AI handles complex tasks with self-correction and error recovery</div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🌐</div>
+                            <div class="feature-title">Embedded Browser</div>
+                            <div class="feature-desc">Integrated browser for testing web applications directly</div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">⏳</div>
+                            <div class="feature-title">AI Consultation</div>
+                            <div class="feature-desc">Pre-execution plan validation and risk assessment</div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🔧</div>
+                            <div class="feature-title">MCP Integration</div>
+                            <div class="feature-desc">Model Context Protocol for extended functionality</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-input-area">
+                    <textarea
+                        class="chat-input"
+                        placeholder="Describe what you want to build or fix..."
+                        id="chatInput"
+                    ></textarea>
+                    <div class="action-buttons">
+                        <button class="action-btn" onclick="sendMessage()">🚀 Execute Task</button>
+                        <button class="action-btn secondary" onclick="showBrowserModal()">🌐 Open Browser</button>
+                        <button class="action-btn secondary" onclick="showConsultationModal()">⏳ AI Consultation</button>
+                        <button class="action-btn danger" onclick="clearChat()">🗑️ Clear</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-dot"></div>
+                <span>Backend: Connected</span>
+            </div>
+            <div class="status-item">
+                <div class="status-dot"></div>
+                <span>AI Models: Ready</span>
+            </div>
+            <div class="status-item">
+                <div class="status-dot warning"></div>
+                <span>Demo Mode</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Browser -->
+    <div class="modal" id="browserModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-title">🌐 Embedded Browser</div>
+            <div class="modal-text">
+                The embedded browser feature allows you to test web applications directly within the AI assistant.
+                <br><br>
+                <strong>Demo Status:</strong> Feature implemented and ready for testing with backend integration.
+            </div>
+            <div class="modal-buttons">
+                <button class="action-btn" onclick="closeModal('browserModal')">Got it!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for AI Consultation -->
+    <div class="modal" id="consultationModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-title">⏳ AI Consultation</div>
+            <div class="modal-text">
+                AI Consultation provides pre-execution plan validation and risk assessment before running tasks.
+                <br><br>
+                <strong>Demo Status:</strong> Feature implemented with plan analysis and correction capabilities.
+            </div>
+            <div class="modal-buttons">
+                <button class="action-btn" onclick="closeModal('consultationModal')">Understood!</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentView = 'chat';
+
+        function showChat() {
+            currentView = 'chat';
+            updateNavButtons();
+            document.getElementById('welcomeScreen').style.display = 'block';
+        }
+
+        function showBrowser() {
+            currentView = 'browser';
+            updateNavButtons();
+            showBrowserModal();
+        }
+
+        function showConsultation() {
+            currentView = 'consultation';
+            updateNavButtons();
+            showConsultationModal();
+        }
+
+        function showSettings() {
+            currentView = 'settings';
+            updateNavButtons();
+            alert('⚙️ Settings panel would open here in the full application.');
+        }
+
+        function showMCP() {
+            currentView = 'mcp';
+            updateNavButtons();
+            alert('🔧 MCP Servers configuration would open here in the full application.');
+        }
+
+        function updateNavButtons() {
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            switch(currentView) {
+                case 'chat':
+                    buttons[0].classList.add('active');
+                    break;
+                case 'browser':
+                    buttons[1].classList.add('active');
+                    break;
+                case 'consultation':
+                    buttons[2].classList.add('active');
+                    break;
+                case 'settings':
+                    buttons[3].classList.add('active');
+                    break;
+                case 'mcp':
+                    buttons[4].classList.add('active');
+                    break;
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+
+            if (!message) {
+                alert('Please enter a task description!');
+                return;
+            }
+
+            alert(`🚀 Task execution would start here for: "${message}"\\n\\nIn the full application, this would:\\n• Analyze the request\\n• Create an execution plan\\n• Run AI consultation\\n• Execute the task with corrections\\n• Provide real-time feedback`);
+
+            input.value = '';
+        }
+
+        function showBrowserModal() {
+            document.getElementById('browserModal').style.display = 'flex';
+        }
+
+        function showConsultationModal() {
+            document.getElementById('consultationModal').style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function clearChat() {
+            document.getElementById('chatInput').value = '';
+            alert('Chat cleared! 🗑️');
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 ho_OJluGun AI Demo UI loaded successfully!');
+            console.log('Demo features:');
+            console.log('• Autonomous task execution');
+            console.log('• Embedded browser integration');
+            console.log('• AI consultation system');
+            console.log('• MCP protocol support');
+        });
+    </script>
+</body>
+</html>

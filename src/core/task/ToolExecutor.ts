@@ -3,6 +3,7 @@ import { FileContextTracker } from "@core/context/context-tracking/FileContextTr
 import { ClineIgnoreController } from "@core/ignore/ClineIgnoreController"
 import { DiffViewProvider } from "@integrations/editor/DiffViewProvider"
 import { BrowserSession } from "@services/browser/BrowserSession"
+import { AIConsultationManager } from "../../services/AIConsultationManager"
 import { UrlContentFetcher } from "@services/browser/UrlContentFetcher"
 import { McpHub } from "@services/mcp/McpHub"
 import { ClineAsk, ClineSay } from "@shared/ExtensionMessage"
@@ -47,6 +48,22 @@ import { ToolResultUtils } from "./tools/utils/ToolResultUtils"
 export class ToolExecutor {
 	private autoApprover: AutoApprove
 	private coordinator: ToolExecutorCoordinator
+	private consultationManager: AIConsultationManager
+
+	// ==========================================
+	// COSMOS AI: MAX_CORRECTION_DEPTH INTEGRATION
+	// ==========================================
+	/**
+	 * Максимальна кількість спроб корекції для одного інструменту
+	 * Це запобігає нескінченним циклам AI коррекції
+	 */
+	private static readonly MAX_CORRECTION_DEPTH = 3
+
+	/**
+	 * Лічильник спроб корекції для кожного інструменту
+	 * Ключ: tool.name, Значення: кількість спроб
+	 */
+	private correctionAttempts = new Map<string, number>()
 
 	// Auto-approval methods using the AutoApprove class
 	private shouldAutoApproveTool(toolName: ClineDefaultTool): boolean | [boolean, boolean] {
@@ -112,6 +129,7 @@ export class ToolExecutor {
 		private switchToActMode: () => Promise<boolean>,
 	) {
 		this.autoApprover = new AutoApprove(this.stateManager)
+		this.consultationManager = new AIConsultationManager()
 
 		// Initialize the coordinator and register all tool handlers
 		this.coordinator = new ToolExecutorCoordinator()
@@ -367,16 +385,289 @@ export class ToolExecutor {
 	}
 
 	/**
-	 * Handle complete block execution
+	 * Handle complete block execution with Cosmos AI MAX_CORRECTION_DEPTH logic
 	 */
 	private async handleCompleteBlock(block: ToolUse, config: any): Promise<void> {
-		const result = await this.coordinator.execute(config, block)
+		// ==========================================
+		// COSMOS AI: AI CONSULTATION BEFORE EXECUTION
+		// ==========================================
+		if (this.consultationManager.isConsultationEnabled()) {
+			const planDescription = `Tool: ${block.name}\nParams: ${JSON.stringify(block.params, null, 2)}`
+			const consultation = await this.consultationManager.consultOnPlan(planDescription, this.cwd)
+			
+			if (!consultation.shouldProceed) {
+				await this.say("error", `⏳ AI Consultation blocked execution: ${consultation.consultation}`)
+				this.pushToolResult(formatResponse.toolError("Execution blocked by AI consultation"), block)
+				return
+			}
+			
+			if (consultation.corrections.length > 0) {
+				await this.say("text", `⏳ AI Consultation suggestions:\n${consultation.corrections.join('\n')}`)
+			}
+		}
+
+		// ==========================================
+		// COSMOS AI: SAFETY CHECKPOINT BEFORE EXECUTION
+		// ==========================================
+		const toolId = block.name
+
+		// Створюємо чекпоінт для ризикованих операцій
+		if (this.isRiskyTool(block.name)) {
+			await this.createSafetyCheckpoint(block)
+		}
+
+		let result = await this.coordinator.execute(config, block)
+
+		// ==========================================
+		// COSMOS AI: ERROR CORRECTION LOGIC
+		// ==========================================
+		if (!this.isToolResultSuccessful(result)) {
+			const attempts = this.correctionAttempts.get(toolId) || 0
+
+			if (attempts < ToolExecutor.MAX_CORRECTION_DEPTH) {
+				// Спробуємо AI коррекцію
+				const correctionResult = await this.attemptAICorrection(block, result, config)
+
+				if (correctionResult) {
+					// AI надавав пропозицію - створюємо corrective tool call
+					await this.say(
+						"text",
+						`🤖 AI корекція ${attempts + 1}/${ToolExecutor.MAX_CORRECTION_DEPTH}: ${correctionResult.description}`,
+					)
+
+					// Збільшуємо лічильник спроб
+					this.correctionAttempts.set(toolId, attempts + 1)
+
+					// Створюємо новий блок для корекції та виконуємо його
+					const correctiveBlock = this.createCorrectiveToolBlock(block, correctionResult)
+					result = await this.coordinator.execute(config, correctiveBlock)
+				} else {
+					// AI не зміг допомогти - повідомляємо користувача
+					this.correctionAttempts.set(toolId, attempts + 1)
+					await this.say(
+						"error",
+						`AI не зміг виправити помилку інструменту '${toolId}'. Спроба ${attempts + 1}/${ToolExecutor.MAX_CORRECTION_DEPTH}`,
+					)
+				}
+			} else {
+				// MAX_CORRECTION_DEPTH досягнуто - аварійний вихід
+				await this.handleMaxCorrectionLimitReached(block, toolId)
+			}
+		}
 
 		this.pushToolResult(result, block)
 
 		// Handle focus chain updates
 		if (!block.partial && this.stateManager.getGlobalSettingsKey("focusChainSettings").enabled) {
 			await this.updateFCListFromToolResponse(block.params.task_progress)
+		}
+	}
+
+	// ===========================================================================================
+	// COSMOS AI: MAX_CORRECTION_DEPTH IMPLEMENTATION METHODS
+	// ===========================================================================================
+
+	/**
+	 * Визначає чи є результат інструменту успішним
+	 */
+	private isToolResultSuccessful(result: any): boolean {
+		// Інструмент вважається успішним якщо немає помилки або він повернув успішний статус
+		return !result.error && result.success !== false
+	}
+
+	/**
+	 * Визначає чи є інструмент ризикованим і потребує чекпоінта
+	 */
+	private isRiskyTool(toolName: string): boolean {
+		const riskyTools = [
+			"run_terminal_cmd",
+			"run_command", // термінальні команди
+			"write_to_file",
+			"file_edit", // модифікація файлів
+			"apply_diff", // застосування змін
+		]
+		return riskyTools.includes(toolName)
+	}
+
+	/**
+	 * Створює safety checkpoint для ризикованих операцій
+	 */
+	private async createSafetyCheckpoint(block: ToolUse): Promise<void> {
+		try {
+			// Використовуємо існуючий git stash механізм Cline
+			const success = await this.executeGitCommand(
+				`git stash push -m "cosmos-safety-checkpoint-${block.name}-${Date.now()}"`,
+			)
+			if (success) {
+				await this.say("text", `🛡️ Створено safety checkpoint для ${block.name}`)
+			}
+		} catch (error) {
+			console.warn("Failed to create safety checkpoint:", error)
+		}
+	}
+
+	/**
+	 * Відновлює стан з git stash при досягненні MAX_CORRECTION_DEPTH
+	 */
+	private async restoreFromSafetyCheckpoint(_block: ToolUse): Promise<void> {
+		try {
+			const success = await this.executeGitCommand("git stash pop")
+			if (success) {
+				await this.say("text", `🔄 Відновлено стан до safety checkpoint`)
+			}
+		} catch (error) {
+			console.error("Failed to restore from safety checkpoint:", error)
+			await this.say("error", "❌ Помилка відновлення з safety checkpoint")
+		}
+	}
+
+	/**
+	 * Спроба AI коррекції проваленого інструменту
+	 */
+	private async attemptAICorrection(
+		block: ToolUse,
+		failedResult: any,
+		_config: any,
+	): Promise<{ description: string; toolCall: any } | null> {
+		try {
+			// Створюємо контекст помилки
+			const errorContext = await this.gatherErrorContext(block, failedResult)
+
+			// Надсилаємо в AI для аналізу
+			const correctionPrompt = `
+Проаналізуй цю помилку виконання інструменту та запропонуй корекцію:
+
+Інструмент: ${block.name}
+Помилка: ${failedResult.error || "Unknown error"}
+Вихід: ${failedResult.output || "No output"}
+Контекст: ${errorContext}
+
+Поверни конкретний план корекції у форматі:
+DESCRIPTION: [короткий опис що робиться]
+TOOL: [ім'я інструменту для корекції]
+PARAMS: [параметри для інструменту]
+`
+
+			const stream = this.api.createMessage("", [{ role: "user", content: correctionPrompt }])
+
+			let aiText = ""
+			for await (const chunk of stream) {
+				if (chunk.type === "text") {
+					aiText += chunk.text
+				}
+			}
+
+			// Парсимо відповідь AI
+			const correction = this.parseAICorrectionResponse(aiText)
+
+			return correction
+		} catch (error) {
+			console.error("AI correction failed:", error)
+			return null
+		}
+	}
+
+	/**
+	 * Створює контекст помилки для AI аналізу
+	 */
+	private async gatherErrorContext(block: ToolUse, failedResult: any): Promise<string> {
+		const contextParts = []
+
+		// Інформація про завдання
+		contextParts.push(`Task: ${this.taskId}`)
+		contextParts.push(`Tool: ${block.name}`)
+		contextParts.push(`Parameters: ${JSON.stringify(block.params)}`)
+
+		// Інформація про помилку
+		if (failedResult.error) {
+			contextParts.push(`Error: ${failedResult.error}`)
+		}
+		if (failedResult.output) {
+			contextParts.push(`Output: ${failedResult.output}`)
+		}
+
+		// Інформація про робочий простір
+		contextParts.push(`CWD: ${this.cwd}`)
+
+		return contextParts.join("\n")
+	}
+
+	/**
+	 * Парсить відповідь AI для корекції
+	 */
+	private parseAICorrectionResponse(aiText: string): { description: string; toolCall: any } | null {
+		try {
+			const lines = aiText.split("\n")
+			let description = ""
+			let toolName = ""
+			let params = {}
+
+			for (const line of lines) {
+				if (line.startsWith("DESCRIPTION:")) {
+					description = line.replace("DESCRIPTION:", "").trim()
+				} else if (line.startsWith("TOOL:")) {
+					toolName = line.replace("TOOL:", "").trim()
+				} else if (line.startsWith("PARAMS:")) {
+					const paramsStr = line.replace("PARAMS:", "").trim()
+					params = JSON.parse(paramsStr)
+				}
+			}
+
+			if (description && toolName) {
+				return {
+					description,
+					toolCall: { name: toolName, params },
+				}
+			}
+
+			return null
+		} catch (error) {
+			console.error("Failed to parse AI correction response:", error)
+			return null
+		}
+	}
+
+	/**
+	 * Створює корективний tool block
+	 */
+	private createCorrectiveToolBlock(originalBlock: ToolUse, correction: { description: string; toolCall: any }): ToolUse {
+		return {
+			...originalBlock,
+			name: correction.toolCall.name,
+			params: correction.toolCall.params,
+		}
+	}
+
+	/**
+	 * Обробляє досягнення MAX_CORRECTION_DEPTH ліміту
+	 */
+	private async handleMaxCorrectionLimitReached(block: ToolUse, toolId: string): Promise<void> {
+		const message = `🚨 **MAX_CORRECTION_DEPTH досягнуто** для інструменту '${toolId}'
+
+Досягнуто максимальну кількість (${ToolExecutor.MAX_CORRECTION_DEPTH}) спроб корекції.
+Інструмент '${toolId}' більше не виконуватиметься в цьому завданні.
+
+🔄 Відновлюю стан до останнього safety checkpoint...`
+
+		await this.say("error", message)
+
+		// Відновлюємо з safety checkpoint
+		await this.restoreFromSafetyCheckpoint(block)
+
+		// Очищаємо лічильник для цього інструменту
+		this.correctionAttempts.delete(toolId)
+	}
+
+	/**
+	 * Виконує git команду через існуючий executeCommandTool
+	 */
+	private async executeGitCommand(command: string): Promise<boolean> {
+		try {
+			const result = await this.executeCommandTool(command, 30) // 30 second timeout
+			return result[0] // success boolean
+		} catch (error) {
+			console.error("Git command failed:", error)
+			return false
 		}
 	}
 }

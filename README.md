@@ -12,10 +12,10 @@ English | <a href="https://github.com/cline/cline/blob/main/locales/es/README.md
 <table>
 <tbody>
 <td align="center">
-<a href="https://marketplace.visualstudio.com/items?itemName=saoudrizwan.claude-dev" target="_blank"><strong>Download on VS Marketplace</strong></a>
+<a href="https://marketplace.visualstudio.com/items?itemName=ho_OJluGun.ho-ojlugun-ai" target="_blank"><strong>Download on VS Marketplace</strong></a>
 </td>
 <td align="center">
-<a href="https://discord.gg/cline" target="_blank"><strong>Discord</strong></a>
+<a href="https://github.com/ho_OJluGun/ho_OJluGun_ai" target="_blank"><strong>GitHub Repository</strong></a>
 </td>
 <td align="center">
 <a href="https://www.reddit.com/r/cline/" target="_blank"><strong>r/cline</strong></a>
@@ -24,13 +24,13 @@ English | <a href="https://github.com/cline/cline/blob/main/locales/es/README.md
 <a href="https://github.com/cline/cline/discussions/categories/feature-requests?discussions_q=is%3Aopen+category%3A%22Feature+Requests%22+sort%3Atop" target="_blank"><strong>Feature Requests</strong></a>
 </td>
 <td align="center">
-<a href="https://docs.cline.bot/getting-started/for-new-coders" target="_blank"><strong>Getting Started</strong></a>
+<a href="https://github.com/ho_OJluGun/ho_OJluGun_ai/blob/main/README.md" target="_blank"><strong>Getting Started</strong></a>
 </td>
 </tbody>
 </table>
 </div>
 
-Meet Cline, an AI assistant that can use your **CLI** a**N**d **E**ditor.
+Meet ho_OJluGun AI, a custom AI assistant based on Cline with enhanced capabilities and personalized features.
 
 Thanks to [Claude Sonnet's agentic coding capabilities](https://www.anthropic.com/claude/sonnet), Cline can handle complex software development tasks step-by-step. With tools that let him create & edit files, explore large projects, use the browser, and execute terminal commands (after you grant permission), he can assist you in ways that go beyond code completion or tech support. Cline can even use the Model Context Protocol (MCP) to create new tools and extend his own capabilities. While autonomous AI scripts traditionally run in sandboxed environments, this extension provides a human-in-the-loop GUI to approve every file change and terminal command, providing a safe and accessible way to explore the potential of agentic AI.
 
@@ -143,4 +143,4 @@ To contribute to the project, start with our [Contributing Guide](CONTRIBUTING.m
 
 ## License
 
-[Apache 2.0 © 2025 Cline Bot Inc.](./LICENSE)
+[Apache 2.0 © 2025 ho_OJluGun](./LICENSE)

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ho_OJluGun AI - Standalone Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .logo {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .status-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .status-card h3 {
+            margin-top: 0;
+            color: #4CAF50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .status-card.running h3::before {
+            content: "🟢";
+        }
+        .status-card.stopped h3::before {
+            content: "🔴";
+        }
+        .status-card.warning h3::before {
+            content: "🟡";
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .feature-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .feature-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .feature-desc {
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+        .actions {
+            text-align: center;
+        }
+        .btn {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        .btn.secondary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            opacity: 0.7;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🚀 ho_OJluGun AI</div>
+            <div class="subtitle">Автономный AI-ассистент для разработки</div>
+        </div>
+
+        <div class="status-grid">
+            <div class="status-card running">
+                <h3>Standalone Сервер</h3>
+                <p>✅ Запущен на порту 26040 (gRPC)</p>
+                <p>✅ HostBridge на порту 26041</p>
+            </div>
+            <div class="status-card running">
+                <h3>Webview Сервер</h3>
+                <p>✅ Vite dev server запущен</p>
+                <p>✅ Hot reload активен</p>
+            </div>
+            <div class="status-card warning">
+                <div class="status-card warning">
+                <h3>UI Подключение</h3>
+                <p>⚠️ Требует настройки gRPC клиента</p>
+                <p>🔧 Нужен standalone режим</p>
+            </div>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🌐</div>
+                <div class="feature-title">Встроенный браузер</div>
+                <div class="feature-desc">Интегрированный браузер для тестирования веб-приложений</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⏳</div>
+                <div class="feature-title">AI Консультация</div>
+                <div class="feature-desc">Предварительная проверка планов ИИ перед выполнением</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <div class="feature-title">Автономное выполнение</div>
+                <div class="feature-desc">Самостоятельное выполнение задач с коррекцией ошибок</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔧</div>
+                <div class="feature-title">MCP интеграция</div>
+                <div class="feature-desc">Поддержка Model Context Protocol для расширения функциональности</div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <a href="demo-ui.html" class="btn">🌐 Открыть Demo UI</a>
+            <a href="http://localhost:25464" class="btn secondary">🔧 Открыть VSCode UI</a>
+            <button class="btn secondary" onclick="checkServers()">🔍 Проверить серверы</button>
+            <button class="btn secondary" onclick="showLogs()">📋 Показать логи</button>
+        </div>
+
+        <div class="footer">
+            <p>ho_OJluGun AI - революционная система автономного кодирования</p>
+            <p>Создано для комфортной разработки без VS Code дебаггинга</p>
+        </div>
+    </div>
+
+    <script>
+        async function checkServers() {
+            const results = [];
+
+            // Проверяем gRPC сервер
+            try {
+                const response = await fetch('http://localhost:26040', { mode: 'no-cors' });
+                results.push('✅ gRPC сервер: доступен');
+            } catch (e) {
+                results.push('⚠️ gRPC сервер: проверка недоступна');
+            }
+
+            // Проверяем webview сервер
+            try {
+                const response = await fetch('http://localhost:25464');
+                if (response.ok) {
+                    results.push('✅ Webview сервер: доступен');
+                } else {
+                    results.push('⚠️ Webview сервер: отвечает с ошибкой');
+                }
+            } catch (e) {
+                results.push('❌ Webview сервер: недоступен');
+            }
+
+            alert('Результаты проверки:\\n\\n' + results.join('\\n'));
+        }
+
+        function showLogs() {
+            const logs = [
+                '📋 Standalone сервер логи: tail -f server.log',
+                '📋 Webview сервер логи: tail -f webview.log',
+                '📋 Остановка серверов: pkill -f "tsx\\|vite"',
+                '📋 Перезапуск: npm run test:standalone'
+            ];
+
+            alert('Команды для просмотра логов:\\n\\n' + logs.join('\\n'));
+        }
+
+        // Автоматическая проверка при загрузке
+        window.addEventListener('load', () => {
+            setTimeout(checkServers, 1000);
+        });
+    </script>
+</body>
+</html>

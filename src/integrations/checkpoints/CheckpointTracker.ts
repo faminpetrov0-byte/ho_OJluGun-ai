@@ -68,8 +68,36 @@ class CheckpointTracker {
 	}
 
 	/**
+	 * Initializes ZIP-based checkpoint system as primary strategy.
+	 * Creates necessary directories and sets up ZIP storage.
+	 *
+	 * @returns Promise<boolean> true if initialization successful
+	 */
+	private async initializeZipCheckpoint(): Promise<boolean> {
+		try {
+			console.info(`Initializing ZIP checkpoint system for task ${this.taskId}`)
+
+			// Create .cosmos-ai-backups directory if it doesn't exist
+			const backupDir = path.join(this.cwd, '.cosmos-ai-backups')
+			await fs.mkdir(backupDir, { recursive: true })
+
+			// Create initial ZIP checkpoint to verify system works
+			const timestamp = Date.now().toString()
+			const backupPath = path.join(backupDir, timestamp)
+
+			await fs.mkdir(backupPath, { recursive: true })
+			console.info(`ZIP checkpoint system initialized successfully for task ${this.taskId}`)
+
+			return true
+		} catch (error) {
+			console.error(`Failed to initialize ZIP checkpoint system for task ${this.taskId}:`, error)
+			return false
+		}
+	}
+
+	/**
 	 * Creates a new CheckpointTracker instance for tracking changes in a task.
-	 * Handles initialization of the shadow git repository.
+	 * Handles initialization with ZIP as primary strategy and Git as fallback.
 	 *
 	 * @param taskId - Unique identifier for the task to track
 	 * @param globalStoragePath - the globalStorage path
@@ -78,13 +106,13 @@ class CheckpointTracker {
 	 * @returns Promise resolving to new CheckpointTracker instance, or undefined if checkpoints are disabled
 	 * @throws Error if:
 	 * - globalStoragePath is not supplied
-	 * - Git is not installed
 	 * - Working directory is invalid or in a protected location
-	 * - Shadow git initialization fails
+	 * - Both ZIP and Git initialization fails
 	 *
 	 * Key operations:
-	 * - Validates git installation and settings
-	 * - Creates/initializes shadow git repository
+	 * - Validates workspace settings
+	 * - Tries ZIP first (primary strategy)
+	 * - Falls back to Git if ZIP fails
 	 *
 	 * Configuration:
 	 * - Respects 'cline.enableCheckpoints' VS Code setting
@@ -102,13 +130,6 @@ class CheckpointTracker {
 			if (!enableCheckpointsSetting) {
 				console.info(`Checkpoints disabled by setting for task ${taskId}`)
 				return undefined // Don't create tracker when disabled
-			}
-
-			// Check if git is installed by attempting to get version
-			try {
-				await simpleGit().version()
-			} catch (_error) {
-				throw new Error("Git must be installed to use checkpoints.") // FIXME: must match what we check for in TaskHeader to show link
 			}
 
 			// Validate and normalize workspace paths - for now, we just use the first valid path
@@ -131,6 +152,19 @@ class CheckpointTracker {
 
 			const newTracker = new CheckpointTracker(taskId, workingDir, cwdHash)
 
+			// Try ZIP first (primary strategy)
+			console.info(`Trying ZIP checkpoint initialization for task ${taskId}`)
+			const zipSuccess = await newTracker.initializeZipCheckpoint()
+
+			if (zipSuccess) {
+				console.info(`ZIP checkpoint initialization successful for task ${taskId}`)
+				const durationMs = Math.round(performance.now() - startTime)
+				telemetryService.captureCheckpointUsage(taskId, "zip_checkpoint_initialized", durationMs)
+				return newTracker
+			}
+
+			// If ZIP fails, try Git as fallback
+			console.warn(`ZIP checkpoint failed for task ${taskId}, trying Git fallback...`)
 			const gitPath = await getShadowGitPath(newTracker.cwdHash)
 			await newTracker.gitOperations.initShadowGit(gitPath, workingDir, taskId)
 

@@ -625,14 +625,14 @@ export class TelemetryService {
 	}
 
 	/**
-	 * Records interactions with the git-based checkpoint system
+	 * Records interactions with the checkpoint system (ZIP or Git-based)
 	 * @param ulid Unique identifier for the task
 	 * @param action The type of checkpoint action
 	 * @param durationMs Optional duration of the operation in milliseconds
 	 */
 	public captureCheckpointUsage(
 		ulid: string,
-		action: "shadow_git_initialized" | "commit_created" | "restored" | "diff_generated",
+		action: "shadow_git_initialized" | "zip_checkpoint_initialized" | "commit_created" | "restored" | "diff_generated",
 		durationMs?: number,
 	) {
 		if (!this.isCategoryEnabled("checkpoints")) {

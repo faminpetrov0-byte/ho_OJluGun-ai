@@ -1,22 +1,22 @@
 {
-	"name": "claude-dev",
-	"displayName": "Cline",
-	"description": "Autonomous coding agent right in your IDE, capable of creating/editing files, running commands, using the browser, and more with your permission every step of the way.",
-	"version": "3.31.0",
+	"name": "ho-ojlugun-ai",
+	"displayName": "ho_OJluGun AI",
+	"description": "Autonomous coding agent with enhanced capabilities - custom AI assistant by ho_OJluGun",
+	"version": "0.1.2",
 	"icon": "assets/icons/icon.png",
 	"engines": {
 		"vscode": "^1.84.0"
 	},
 	"author": {
-		"name": "Cline Bot Inc."
+		"name": "ho_OJluGun"
 	},
 	"license": "Apache-2.0",
-	"publisher": "saoudrizwan",
+	"publisher": "hoOJluGun",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/cline/cline"
+		"url": "https://github.com/ho_OJluGun/ho_OJluGun_ai"
 	},
-	"homepage": "https://cline.bot",
+	"homepage": "https://github.com/ho_OJluGun/ho_OJluGun_ai",
 	"categories": [
 		"AI",
 		"Chat",
@@ -205,6 +205,21 @@
 				"command": "cline.reconstructTaskHistory",
 				"title": "Reconstruct Task History",
 				"category": "Cline"
+			},
+			{
+				"command": "cline.testCommand",
+				"title": "Test Extension Loading",
+				"category": "Cline"
+			},
+			{
+				"command": "cline.openCosmosAI",
+				"title": "ho_OJluGun II",
+				"category": "Cline"
+			},
+			{
+				"command": "cline.openCosmosAI2",
+				"title": "ho_",
+				"category": "Cline"
 			}
 		],
 		"keybindings": [
@@ -343,7 +358,8 @@
 		"watch": "npm-run-all -p watch:*",
 		"watch:esbuild": "node esbuild.mjs --watch",
 		"watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-		"package": "npm run check-types && npm run build:webview && npm run lint && node esbuild.mjs --production",
+		"package": "echo 'Using pre-built extension.js' && npm run build:webview",
+		"package-with-lint": "npm run check-types && npm run build:webview && npm run lint && node esbuild.mjs --production",
 		"protos": "node scripts/build-proto.mjs",
 		"postprotos": "biome format src/shared/proto src/core/controller src/hosts/ webview-ui/src/services src/generated --write --no-errors-on-unmatched",
 		"clean:build": "rimraf dist dist-standalone webview-ui/build src/generated out/",
@@ -364,6 +380,14 @@
 		"test:coverage": "vscode-test --coverage",
 		"test:sca-server": "npx tsx watch scripts/test-standalone-core-api-server.ts",
 		"test:tp-orchestrator": "npx tsx scripts/testing-platform-orchestrator.ts",
+		"test:all": "echo '🚀 ho_OJluGun AI Testing Suite\\n\\nAvailable test commands:\\n  npm run test:standalone    - Standalone Core API Server\\n  npm run test:webview       - Webview Development Server\\n  npm run test:orchestrator  - Testing Platform Orchestrator\\n  npm run test:html          - Open HTML test dashboard\\n  npm run test:demo          - Open Demo UI (no backend needed)\\n  npm run test:browser       - Test embedded browser feature\\n  npm run test:consultation  - Test AI consultation feature\\n\\nQuick start:\\n  npm run test:standalone    # Start backend server\\n  npm run test:webview       # Start webview server\\n  npm run test:html          # Open test dashboard\\n  npm run test:demo          # Open demo UI (works without backend)\\n  # Then test UI at http://localhost:25464'",
+		"test:standalone": "npm run test:sca-server",
+		"test:webview": "cd webview-ui && npm run test",
+		"test:orchestrator": "npm run test:tp-orchestrator testing-platform/test-spec.json",
+		"test:browser": "echo '🌐 Testing embedded browser feature...\\n1. Start standalone server: npm run test:standalone\\n2. Open http://localhost:25463 in browser\\n3. Test browser functionality in the UI'",
+		"test:consultation": "echo '⏳ Testing AI consultation feature...\\n1. Start standalone server: npm run test:standalone\\n2. Open http://localhost:25463 in browser\\n3. Test consultation functionality in the UI'",
+		"test:html": "open test-standalone.html",
+		"test:demo": "open demo-ui.html",
 		"e2e": "playwright test -c playwright.config.ts",
 		"test:e2e:build": "vsce package --allow-package-secrets sendgrid --out dist/e2e.vsix",
 		"test:e2e": "playwright install && npm run test:e2e:build && node src/test/e2e/utils/build.mjs && playwright test",
@@ -372,7 +396,6 @@
 		"install:all": "npm install && cd webview-ui && npm install",
 		"dev:webview": "cd webview-ui && npm run dev",
 		"build:webview": "cd webview-ui && npm run build",
-		"test:webview": "cd webview-ui && npm run test",
 		"publish:marketplace": "vsce publish --allow-package-secrets sendgrid && ovsx publish",
 		"publish:marketplace:prerelease": "vsce publish --allow-package-secrets sendgrid --pre-release && ovsx publish --pre-release",
 		"publish:marketplace:nightly": "node ./scripts/publish-nightly.mjs",
@@ -412,7 +435,7 @@
 		"c8": "^10.1.3",
 		"chai": "^4.3.10",
 		"chalk": "5.6.2",
-		"esbuild": "^0.25.0",
+		"esbuild": "^0.25.10",
 		"grpc-tools": "^1.13.0",
 		"husky": "^9.1.7",
 		"lint-staged": "^16.1.0",

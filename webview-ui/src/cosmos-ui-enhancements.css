@@ -1,0 +1,145 @@
+/* 
+ * Cosmos AI UI Enhancements
+ * Космические улучшения интерфейса для Cline
+ */
+
+/* Основной космический фон */
+.cosmos-background {
+	background: linear-gradient(135deg, #0c0c0f 0%, #1a0a1e 25%, #0d0814 50%, #08040c 75%, #030103 100%);
+	position: relative;
+	overflow: hidden;
+}
+
+/* Неоновые эффекты для кнопок */
+.cosmos-button {
+	background: linear-gradient(135deg, rgba(138, 43, 226, 0.8), rgba(147, 51, 234, 0.6));
+	border: 1px solid rgba(138, 43, 226, 0.4);
+	border-radius: 8px;
+	color: #ffffff;
+	padding: 8px 16px;
+	transition: all 0.3s ease;
+	box-shadow: 0 2px 8px rgba(138, 43, 226, 0.3);
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.cosmos-button:hover {
+	background: linear-gradient(135deg, rgba(147, 51, 234, 0.9), rgba(138, 43, 226, 0.7));
+	transform: translateY(-1px);
+	box-shadow: 0 4px 16px rgba(138, 43, 226, 0.5);
+}
+
+/* Космические пузыри сообщений */
+.cosmos-message-bubble {
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	border-radius: 16px;
+	padding: 16px 20px;
+	margin-bottom: 12px;
+	animation: cosmos-message-appear 0.6s ease-out;
+	position: relative;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cosmos-message-bubble.user {
+	background: linear-gradient(135deg, rgba(255, 20, 147, 0.9), rgba(255, 105, 180, 0.9), rgba(255, 182, 193, 0.8));
+	margin-left: auto;
+	max-width: 85%;
+	border-bottom-right-radius: 4px;
+	box-shadow: 0 4px 12px rgba(255, 20, 147, 0.3);
+}
+
+.cosmos-message-bubble.assistant {
+	background: linear-gradient(135deg, rgba(138, 43, 226, 0.9), rgba(147, 51, 234, 0.9), rgba(159, 126, 234, 0.8));
+	margin-right: auto;
+	max-width: 85%;
+	border-bottom-left-radius: 4px;
+	box-shadow: 0 4px 12px rgba(138, 43, 226, 0.3);
+}
+
+@keyframes cosmos-message-appear {
+	from {
+		opacity: 0;
+		transform: translateY(20px) scale(0.95);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+/* Неоновое свечение для активных элементов */
+.cosmos-glow {
+	animation: cosmos-neon-glow 3s ease-in-out infinite;
+}
+
+@keyframes cosmos-neon-glow {
+	0%,
+	100% {
+		box-shadow: 0 0 5px rgba(138, 43, 226, 0.3);
+	}
+	50% {
+		box-shadow:
+			0 0 20px rgba(138, 43, 226, 0.6),
+			0 0 30px rgba(138, 43, 226, 0.4);
+	}
+}
+
+/* Статус индикаторы */
+.cosmos-status {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 4px 12px;
+	border-radius: 12px;
+	font-size: 12px;
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.cosmos-status.thinking {
+	background: rgba(255, 193, 7, 0.2);
+	color: #ffc107;
+	border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.cosmos-status.executing {
+	background: rgba(0, 123, 255, 0.2);
+	color: #007bff;
+	border: 1px solid rgba(0, 123, 255, 0.3);
+}
+
+.cosmos-status.completed {
+	background: rgba(40, 167, 69, 0.2);
+	color: #28a745;
+	border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.cosmos-status.error {
+	background: rgba(220, 53, 69, 0.2);
+	color: #dc3545;
+	border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+/* Пульсирующая анимация для статусов */
+.cosmos-status.thinking::before,
+.cosmos-status.executing::before {
+	content: "";
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: currentColor;
+	animation: cosmos-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes cosmos-pulse {
+	0%,
+	100% {
+		opacity: 0.4;
+		transform: scale(1);
+	}
+	50% {
+		opacity: 1;
+		transform: scale(1.2);
+	}
+}

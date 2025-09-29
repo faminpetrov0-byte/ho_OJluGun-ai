@@ -1,6 +1,7 @@
 import type { Boolean, EmptyRequest } from "@shared/proto/cline/common"
 import { useEffect } from "react"
 import AccountView from "./components/account/AccountView"
+import { CosmosStarsBackground } from "./components/CosmosStarsBackground"
 import ChatView from "./components/chat/ChatView"
 import HistoryView from "./components/history/HistoryView"
 import McpView from "./components/mcp/configuration/McpConfigurationView"
@@ -10,6 +11,12 @@ import { useClineAuth } from "./context/ClineAuthContext"
 import { useExtensionState } from "./context/ExtensionStateContext"
 import { Providers } from "./Providers"
 import { UiServiceClient } from "./services/grpc-client"
+
+/*
+ * 🚀 Cosmos UI Enhancements Integration
+ * Используем современные UX принципы из нашего проекта для улучшения Cline
+ */
+import "./cosmos-ui-enhancements.css"
 
 const AppContent = () => {
 	const {
@@ -58,7 +65,10 @@ const AppContent = () => {
 	}
 
 	return (
-		<div className="flex h-screen w-full flex-col">
+		<div className="flex h-screen w-full flex-col cosmos-ready cosmos-enhanced">
+			{/* 🌌 Cosmos Stars Background - Только для основного интерфейса чата */}
+			{!showSettings && !showHistory && !showMcp && !showAccount && <CosmosStarsBackground />}
+
 			{showSettings && <SettingsView onDone={hideSettings} />}
 			{showHistory && <HistoryView onDone={hideHistory} />}
 			{showMcp && <McpView initialTab={mcpTab} onDone={closeMcpView} />}

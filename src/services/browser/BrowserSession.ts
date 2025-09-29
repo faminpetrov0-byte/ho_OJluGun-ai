@@ -16,6 +16,7 @@ import { StateManager } from "@/core/storage/StateManager"
 import { telemetryService } from "@/services/telemetry"
 import { discoverChromeInstances, isPortOpen, testBrowserConnection } from "./BrowserDiscovery"
 import { ensureChromiumExists } from "./utils"
+import { BrowserRecoveryManager } from "../BrowserRecoveryManager"
 
 // Define browser connection info interface
 export interface BrowserConnectionInfo {
@@ -36,7 +37,6 @@ function splitArgs(str?: string | null): string[] {
 }
 
 export class BrowserSession {
-	private context: vscode.ExtensionContext
 	private browser?: Browser
 	private page?: Page
 	private currentMousePosition?: string
@@ -44,6 +44,8 @@ export class BrowserSession {
 	private lastConnectionAttempt: number = 0
 	private isConnectedToRemote: boolean = false
 	private useWebp: boolean
+	private context: vscode.ExtensionContext
+	private recoveryManager: BrowserRecoveryManager
 
 	// Telemetry tracking properties
 	private sessionStartTime: number = 0
@@ -55,6 +57,7 @@ export class BrowserSession {
 		this.context = context
 		this.stateManager = stateManager
 		this.useWebp = useWebp
+		this.recoveryManager = new BrowserRecoveryManager()
 	}
 
 	// Tests remote browser connection
@@ -388,6 +391,9 @@ export class BrowserSession {
 			// Reset tracking properties
 			this.sessionStartTime = 0
 			this.browserActions = []
+			
+			// Сбрасываем менеджер восстановления
+			this.recoveryManager.reset()
 		}
 		return {}
 	}
@@ -420,9 +426,11 @@ export class BrowserSession {
 		this.page.on("console", consoleListener)
 		this.page.on("pageerror", errorListener)
 
+		let actionSuccess = true
 		try {
 			await action(this.page)
 		} catch (err) {
+			actionSuccess = false
 			const errorMessage = err instanceof Error ? err.message : String(err)
 
 			if (!(err instanceof TimeoutError)) {
@@ -486,6 +494,10 @@ export class BrowserSession {
 		// this.page.removeAllListeners() <- causes the page to crash!
 		this.page.off("console", consoleListener)
 		this.page.off("pageerror", errorListener)
+
+		// Записываем действие в менеджер восстановления
+		const lastAction = this.browserActions[this.browserActions.length - 1] || 'unknown'
+		this.recoveryManager.recordAction(lastAction, actionSuccess)
 
 		return {
 			screenshot,
@@ -589,6 +601,9 @@ export class BrowserSession {
 		this.browserActions.push("scrollDown")
 
 		return this.doAction(async (page) => {
+			// Проверяем текущую позицию скролла
+			const beforeScroll = await page.evaluate(() => window.pageYOffset)
+			
 			await page.evaluate(() => {
 				window.scrollBy({
 					top: 600,
@@ -596,6 +611,21 @@ export class BrowserSession {
 				})
 			})
 			await setTimeoutPromise(300)
+			
+			// Проверяем изменилась ли позиция (достигли ли конца страницы)
+			const afterScroll = await page.evaluate(() => window.pageYOffset)
+			const isAtEnd = await page.evaluate(() => {
+				const scrollTop = window.pageYOffset
+				const windowHeight = window.innerHeight
+				const documentHeight = document.documentElement.scrollHeight
+				return (scrollTop + windowHeight) >= (documentHeight - 100)
+			})
+			
+			// Если достигли конца или скролл не произошел - останавливаемся
+			if (isAtEnd || Math.abs(afterScroll - beforeScroll) < 10) {
+				console.log('[BrowserSession] Scroll reached end or no movement detected')
+				throw new Error("Reached end of page - stopping scroll")
+			}
 		})
 	}
 

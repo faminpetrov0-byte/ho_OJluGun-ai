@@ -1,7 +1,7 @@
 import { BrowserSettings, DEFAULT_BROWSER_SETTINGS } from "@shared/BrowserSettings" // Import the interface and defaults
 import * as cheerio from "cheerio"
 // @ts-ignore
-import { Browser, Page } from "puppeteer-core"
+import { Browser, Page, launch } from "puppeteer-core"
 import TurndownService from "turndown"
 import * as vscode from "vscode"
 import { ensureChromiumExists } from "./utils"
@@ -24,7 +24,7 @@ export class UrlContentFetcher {
 		const browserSettings = this.context.globalState.get<BrowserSettings>("browserSettings", DEFAULT_BROWSER_SETTINGS)
 		const customArgsStr = browserSettings.customArgs || ""
 		const customArgs = customArgsStr.trim() ? customArgsStr.split(/\s+/) : []
-		this.browser = await stats.puppeteer.launch({
+		this.browser = await launch({
 			args: [
 				"--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
 				...customArgs, // Append user-provided custom arguments

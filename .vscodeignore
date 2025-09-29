@@ -1,72 +1,85 @@
-# Default
-.vscode/**
-.vscode-test/**
+# Build outputs
 out/
 dist-standalone/
+webview-ui/node_modules/
+webview-ui/src/
+webview-ui/public/
+webview-ui/.vite/
+webview-ui/dist/
+
+# Dependencies
 node_modules/
-src/**
-standalone/**
-.gitignore
-.yarnrc
-esbuild.js
-vsc-extension-quickstart.md
-tsconfig*.json
-**/.eslintrc.json
+.vscode-test/
+.vscode-test-web/
+
+# Source maps
 **/*.map
-**/*.ts
-**/.vscode-test.*
-eslint-rules/**
-.github/**
-.husky/**
 
-# Custom
-**/demo.gif
-.nvmrc
-.gitattributes
-.prettierignore
-.husky/
+# Tests
+src/test/
+tests/
+**/*.test.ts
+**/*.test.js
+**/*.spec.ts
+**/*.spec.js
+testing-platform/
+
+# Development files
+.git/
 .github/
-eslint-rules/
-old_docs/
-evals/
-.changie.yaml
-.codespellrc
-.mocharc.json
-buf.yaml
 .changeset/
-.clinerules/
+.husky/
+.qodo/
+docs/
+evals/
+scripts/
+proto/
+standalone/
 
-# Ignore all webview-ui files except the build directory (https://github.com/microsoft/vscode-webview-ui-toolkit-samples/blob/main/frameworks/hello-world-react-cra/.vscodeignore)
-webview-ui/src/**
-webview-ui/public/**
-webview-ui/index.html
-webview-ui/README.md
-webview-ui/package.json
-webview-ui/package-lock.json
-webview-ui/node_modules/**
-**/.gitignore
+# Config files
+*.config.js
+*.config.ts
+*.config.mjs
+tsconfig*.json
+biome.jsonc
+buf.yaml
+knip.json
+playwright.config.ts
+.mocharc.json
+.nycrc.unit.json
+.changie.yaml
+.nvmrc
+.gitignore
+.gitattributes
+.editorconfig
+.prettierrc
+.eslintrc*
 
-# Ignore docs
-docs/**
-old_docs/**
+# Logs and temp files
+*.log
+.DS_Store
+Thumbs.db
+*.tmp
+*.temp
 
-# Fix issue where codicons don't get packaged (https://github.com/microsoft/vscode-extension-samples/issues/692)
-!node_modules/@vscode/codicons/dist/codicon.css
-!node_modules/@vscode/codicons/dist/codicon.ttf
+# Documentation
+README.md
+CHANGELOG.md
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+LICENSE
+*.md
 
-# Include default themes JSON files used in getTheme
-!src/integrations/theme/default-themes/**
+# VSIX files
+*.vsix
 
-# Include icons
-!assets/icons/**
+# Git directory (huge!)
+.git_disabled/
 
-# Ignore E2E build files
-e2e-build.mjs
-e2e.vsix
-test-results/
+# Large build files (keep extension.js)
+dist/
+!dist/extension.js
 
-# Ignore Storybook files
-**/*.stories.tsx
-*storybook.log
-storybook-static
-**/StorybookDecorator.tsx
+# Webview source (not needed in production)
+webview-ui/src/
+webview-ui/node_modules/

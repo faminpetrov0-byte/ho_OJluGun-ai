@@ -16,7 +16,7 @@ import { createClineAPI } from "./exports"
 import { Logger } from "./services/logging/Logger"
 import { cleanupTestMode, initializeTestMode } from "./services/test/TestMode"
 import { WebviewProviderType } from "./shared/webview/types"
-import "./utils/path" // necessary to have access to String.prototype.toPosix
+import "./utils/path"; // necessary to have access to String.prototype.toPosix
 
 import path from "node:path"
 import type { ExtensionContext } from "vscode"
@@ -53,6 +53,16 @@ https://github.com/microsoft/vscode-webview-ui-toolkit-samples/tree/main/framewo
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
+	console.log("🚀 ho_OJluGun AI activation started")
+	vscode.window.showInformationMessage("🚀 ho_OJluGun AI is starting...")
+	
+	// Register test command immediately
+	context.subscriptions.push(
+		vscode.commands.registerCommand("cline.testCommand", () => {
+			vscode.window.showInformationMessage("🎯 Test command works! Extension is loaded.")
+		})
+	)
+
 	setupHostProvider(context)
 
 	const sidebarWebview = (await initialize(context)) as VscodeWebviewProvider
@@ -127,36 +137,57 @@ export async function activate(context: vscode.ExtensionContext) {
 	)
 
 	const openClineInNewTab = async () => {
-		Logger.log("Opening Cline in new tab")
-		// (this example uses webviewProvider activation event which is necessary to deserialize cached webview, but since we use retainContextWhenHidden, we don't need to use that event)
-		// https://github.com/microsoft/vscode-extension-samples/blob/main/webview-sample/src/extension.ts
-		const tabWebview = HostProvider.get().createWebviewProvider(WebviewProviderType.TAB) as VscodeWebviewProvider
-		const lastCol = Math.max(...vscode.window.visibleTextEditors.map((editor) => editor.viewColumn || 0))
+		Logger.log("Opening ho_OJluGun AI in new tab")
+		try {
+			// (this example uses webviewProvider activation event which is necessary to deserialize cached webview, but since we use retainContextWhenHidden, we don't need to use that event)
+			// https://github.com/microsoft/vscode-extension-samples/blob/main/webview-sample/src/extension.ts
+			const tabWebview = HostProvider.get().createWebviewProvider(WebviewProviderType.TAB) as VscodeWebviewProvider
+			const lastCol = Math.max(...vscode.window.visibleTextEditors.map((editor) => editor.viewColumn || 0))
 
-		// Check if there are any visible text editors, otherwise open a new group to the right
-		const hasVisibleEditors = vscode.window.visibleTextEditors.length > 0
-		if (!hasVisibleEditors) {
-			await vscode.commands.executeCommand("workbench.action.newGroupRight")
+			// Check if there are any visible text editors, otherwise open a new group to the right
+			const hasVisibleEditors = vscode.window.visibleTextEditors.length > 0
+			if (!hasVisibleEditors) {
+				await vscode.commands.executeCommand("workbench.action.newGroupRight")
+			}
+			const targetCol = hasVisibleEditors ? Math.max(lastCol + 1, 1) : vscode.ViewColumn.Two
+
+			const panel = vscode.window.createWebviewPanel(VscodeWebviewProvider.TAB_PANEL_ID, "ho_OJluGun AI", targetCol, {
+				enableScripts: true,
+				retainContextWhenHidden: true,
+				localResourceRoots: [vscode.Uri.file(HostProvider.get().extensionFsPath)],
+			})
+
+			// Try to set icon, but don't fail if icons don't exist
+			try {
+				const lightIconPath = vscode.Uri.joinPath(context.extensionUri, "assets", "icons", "robot_panel_light.png")
+				const darkIconPath = vscode.Uri.joinPath(context.extensionUri, "assets", "icons", "robot_panel_dark.png")
+
+				// Check if files exist before setting
+				const fs = require('fs')
+				const path = require('path')
+				const lightIconExists = fs.existsSync(lightIconPath.fsPath)
+				const darkIconExists = fs.existsSync(darkIconPath.fsPath)
+
+				if (lightIconExists && darkIconExists) {
+					panel.iconPath = {
+						light: lightIconPath,
+						dark: darkIconPath,
+					}
+				}
+			} catch (iconError) {
+				Logger.log(`Icon setup failed, continuing without icons: ${iconError}`)
+			}
+
+			tabWebview.resolveWebviewView(panel)
+
+			// Lock the editor group so clicking on files doesn't open them over the panel
+			await setTimeoutPromise(100)
+			await vscode.commands.executeCommand("workbench.action.lockEditorGroup")
+			return tabWebview
+		} catch (error) {
+			Logger.log(`Failed to open ho_OJluGun AI tab: ${error}`)
+			throw error
 		}
-		const targetCol = hasVisibleEditors ? Math.max(lastCol + 1, 1) : vscode.ViewColumn.Two
-
-		const panel = vscode.window.createWebviewPanel(VscodeWebviewProvider.TAB_PANEL_ID, "Cline", targetCol, {
-			enableScripts: true,
-			retainContextWhenHidden: true,
-			localResourceRoots: [vscode.Uri.file(HostProvider.get().extensionFsPath)],
-		})
-		// TODO: use better svg icon with light and dark variants (see https://stackoverflow.com/questions/58365687/vscode-extension-iconpath)
-
-		panel.iconPath = {
-			light: vscode.Uri.joinPath(context.extensionUri, "assets", "icons", "robot_panel_light.png"),
-			dark: vscode.Uri.joinPath(context.extensionUri, "assets", "icons", "robot_panel_dark.png"),
-		}
-		tabWebview.resolveWebviewView(panel)
-
-		// Lock the editor group so clicking on files doesn't open them over the panel
-		await setTimeoutPromise(100)
-		await vscode.commands.executeCommand("workbench.action.lockEditorGroup")
-		return tabWebview
 	}
 
 	context.subscriptions.push(vscode.commands.registerCommand(commands.PopoutButton, openClineInNewTab))
@@ -493,6 +524,46 @@ export async function activate(context: vscode.ExtensionContext) {
 			const { reconstructTaskHistory } = await import("./core/commands/reconstructTaskHistory")
 			await reconstructTaskHistory(context)
 			telemetryService.captureButtonClick("command_reconstructTaskHistory")
+		}),
+	)
+
+	// Register the ho_OJluGun II command handler
+	context.subscriptions.push(
+		vscode.commands.registerCommand("cline.openCosmosAI", async () => {
+			try {
+				Logger.log("Opening ho_OJluGun AI in new tab")
+
+				// Show progress message
+				await vscode.window.withProgress({
+					location: vscode.ProgressLocation.Notification,
+					title: "ho_OJluGun AI",
+					cancellable: false
+				}, async (progress) => {
+					progress.report({ message: "Starting..." })
+
+					// Try to open in new tab
+					await openClineInNewTab()
+
+					progress.report({ message: "Opened successfully!" })
+				})
+
+				vscode.window.showInformationMessage("✅ ho_OJluGun AI opened successfully!")
+				telemetryService.captureButtonClick("command_openCosmosAI")
+			} catch (error) {
+				Logger.log(`Failed to open ho_OJluGun AI: ${error}`)
+				vscode.window.showErrorMessage(`❌ Failed to open ho_OJluGun AI: ${error instanceof Error ? error.message : String(error)}`)
+			}
+		}),
+	)
+
+
+
+	// Register the short ho_ command handler
+	context.subscriptions.push(
+		vscode.commands.registerCommand("cline.openCosmosAI2", async () => {
+			// Open Cline in new tab with Cosmos AI branding
+			await openClineInNewTab()
+			telemetryService.captureButtonClick("command_openCosmosAI2")
 		}),
 	)
 

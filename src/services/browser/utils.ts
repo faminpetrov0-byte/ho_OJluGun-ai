@@ -1,26 +1,19 @@
-import { fileExistsAtPath } from "@utils/fs"
-import * as fs from "fs/promises"
-import * as path from "path"
-// @ts-ignore
-import PCR from "puppeteer-chromium-resolver"
-import { launch } from "puppeteer-core"
-import { HostProvider } from "@/hosts/host-provider"
-
-interface PCRStats {
-	puppeteer: { launch: typeof launch }
-	executablePath: string
+export function delay(ms: number): Promise<void> {
+	return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-export async function ensureChromiumExists(): Promise<PCRStats> {
-	const puppeteerDir = path.join(HostProvider.get().globalStorageFsPath, "puppeteer")
-	const dirExists = await fileExistsAtPath(puppeteerDir)
-	if (!dirExists) {
-		await fs.mkdir(puppeteerDir, { recursive: true })
+export function isValidUrl(url: string): boolean {
+	try {
+		new URL(url)
+		return true
+	} catch {
+		return false
 	}
-	// if chromium doesn't exist, this will download it to path.join(puppeteerDir, ".chromium-browser-snapshots")
-	// if it does exist it will return the path to existing chromium
-	const stats: PCRStats = await PCR({
-		downloadPath: puppeteerDir,
-	})
-	return stats
+}
+
+export async function ensureChromiumExists(): Promise<{ executablePath: string }> {
+	// Simplified chromium check
+	return {
+		executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+	}
 }
